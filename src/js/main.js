@@ -1,2 +1,3 @@
+import Navigation from './components/Navigation';
 
-console.log('Hello world another');
+console.log(Navigation);

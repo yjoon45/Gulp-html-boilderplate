@@ -4,7 +4,6 @@ const cssnano = require('gulp-cssnano');
 const imagemin = require('gulp-imagemin');
 const imageminPngquant = require('imagemin-pngquant');
 const imageminMozjpeg = require('imagemin-mozjpeg');
-const plumber = require('gulp-plumber');
 const rename = require('gulp-rename');
 const sass = require('gulp-sass');
 const sourcempas = require('gulp-sourcemaps');
@@ -13,16 +12,15 @@ const gutil = require('gulp-util');
 
 const browserSync = require('browser-sync').create();
 const browserify = require('browserify');
-const watchify = require('watchify');
+const babelify = require('babelify');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
-
-const fs = require('fs');
 
 gulp.task('css', () => {
   return gulp.src('./src/scss/main.scss')
     .pipe(sourcempas.init())
-    .pipe(sass({ errLogToConsole: true, outputStyle: 'expanded' }))
+    .pipe(sass({ outputStyle: 'expanded' }))
+    .on('error', sass.logError)
     .pipe(autoprefixer('last 4 version'))
     .pipe(gulp.dest('dist/css'))
     .pipe(cssnano())
@@ -34,12 +32,16 @@ gulp.task('css', () => {
 
 gulp.task('js', () => {
   let b = browserify({
-    entries: './src/js/main.js',
-    transform: ['babelify']
+    entries: './src/js/main.js'
   });
 
-  return b.bundle()
-    .on('error', gutil.log)
+  return b
+    .transform(babelify.configure({presets: ['es2015']}))
+    .bundle()
+    .on('error', function (err) {
+      gutil.log(err.stack);
+      this.emit('end');
+    })
     .pipe(source('main.js'))
     .pipe(buffer())
     .pipe(gulp.dest('./dist/js'))
@@ -73,20 +75,22 @@ gulp.task('html', () => {
     .pipe(browserSync.stream());
 });
 
-gulp.task('browser-sync', () => {
+gulp.task('browser-sync', ['html', 'css', 'js'], () => {
   browserSync.init({
     server: {
       baseDir: './dist/'
     }
   });
-});
-
-gulp.task('build', ['html', 'css', 'js', 'images', 'fonts']);
-
-gulp.task('default', ['html', 'css', 'js', 'images', 'fonts', 'browser-sync'], () => {
   gulp.watch('./src/*.html', ['html']);
   gulp.watch('./src/scss/**/*.scss', ['css']);
   gulp.watch('./src/js/**/*.js', ['js']);
+});
+
+const tasks = ['html', 'css', 'js', 'images', 'fonts'];
+
+gulp.task('build', tasks);
+
+gulp.task('default', tasks.concat('browser-sync'), () => {
   gulp.watch('./src/images/*', ['images']);
   gulp.watch('./src/fonts/*', ['fonts']);
 });
