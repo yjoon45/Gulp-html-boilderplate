@@ -21,10 +21,11 @@ gulp.task('css', () => {
     .pipe(sourcempas.init())
     .pipe(sass({ outputStyle: 'expanded' }))
     .on('error', sass.logError)
-    .pipe(autoprefixer('last 4 version'))
+    .on('error', (err) => browserSync.notify(err.message.toString(), 10000))
+    .pipe(autoprefixer('last 2 version'))
     .pipe(gulp.dest('dist/css'))
     .pipe(cssnano())
-    .pipe(rename({ suffix: '.min'}))
+    .pipe(rename({ suffix: '.bundle'}))
     .pipe(sourcempas.write('.'))
     .pipe(gulp.dest('./dist/css'))
     .pipe(browserSync.stream());
@@ -42,12 +43,13 @@ gulp.task('js', () => {
       gutil.log(err.stack);
       this.emit('end');
     })
+    .on('error', (err) => browserSync.notify(err.message.toString(), 10000))
     .pipe(source('main.js'))
     .pipe(buffer())
     .pipe(gulp.dest('./dist/js'))
     .pipe(sourcempas.init({ loadMaps: true }))
     .pipe(uglify())
-    .pipe(rename({ suffix: '.min' }))
+    .pipe(rename({ suffix: '.bundle' }))
     .pipe(sourcempas.write('./'))
     .pipe(gulp.dest('./dist/js'))
     .pipe(browserSync.stream());
@@ -77,13 +79,9 @@ gulp.task('html', () => {
 
 gulp.task('browser-sync', ['html', 'css', 'js'], () => {
   browserSync.init({
-    server: {
-      baseDir: './dist/'
-    }
+    injectChanges: true,
+    server: './dist'
   });
-  gulp.watch('./src/*.html', ['html']);
-  gulp.watch('./src/scss/**/*.scss', ['css']);
-  gulp.watch('./src/js/**/*.js', ['js']);
 });
 
 const tasks = ['html', 'css', 'js', 'images', 'fonts'];
@@ -93,4 +91,7 @@ gulp.task('build', tasks);
 gulp.task('default', tasks.concat('browser-sync'), () => {
   gulp.watch('./src/images/*', ['images']);
   gulp.watch('./src/fonts/*', ['fonts']);
+  gulp.watch('./src/scss/**/*.scss', ['css']);
+  gulp.watch('./src/js/**/*.js', ['js']);
+  gulp.watch('./src/*.html', ['html']);
 });
