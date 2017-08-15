@@ -1,11 +1,22 @@
+import $ from 'jquery';
+
 class Navigation {
-  constructor () {
+  constructor() {
     console.log('Hello world');
     this.init();
   }
 
-  init () {
-    
+  init() {
+    $(document).on('click', () => this.displayMessage());
+  }
+
+  displayMessage() {
+    this.anotherMethod();
+    alert('Hello jquery world!');
+  }
+
+  anotherMethod() {
+    console.log('Another method should call');
   }
 }
 

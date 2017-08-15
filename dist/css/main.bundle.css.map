@@ -1,0 +1,1 @@
+{"version":3,"sources":["base/_base.scss"],"names":[],"mappings":"AAAA,EACE,qBAAuB,CACvB,AAEF,KACE,eAAiB,CAClB,AAED,KACE,uCAA0C,AAC1C,gBAAkB,CACnB","file":"main.bundle.css","sourcesContent":["* {\r\n  box-sizing: border-box;\r\n }\r\n\r\nhtml {\r\n  font-size: 62.5%;\r\n}\r\n\r\nbody {\r\n  font-family: Arial, Helvetica, sans-serif;\r\n  font-size: 1.6rem;\r\n}\r\n\r\n"]}

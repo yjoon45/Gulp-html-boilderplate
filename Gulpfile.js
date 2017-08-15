@@ -31,19 +31,36 @@ gulp.task('css', () => {
     .pipe(browserSync.stream());
 });
 
+const vendors = ['jquery'];
+
+gulp.task('js:vendor', () => {
+  let b = browserify({debug: true});
+  vendors.forEach(lib => b.require(lib));
+
+  return b.bundle()
+  .pipe(source('vendor.js'))
+  .pipe(buffer())
+  .pipe(sourcempas.init({ loadMaps: true }))
+  .pipe(uglify())
+  .pipe(rename({ suffix: '.bundle' }))
+  .pipe(sourcempas.write('./'))
+  .pipe(gulp.dest('./dist/js'));
+});
+
 gulp.task('js', () => {
   let b = browserify({
     entries: './src/js/main.js'
   });
 
   return b
+    .external(vendors)
     .transform(babelify.configure({presets: ['es2015']}))
     .bundle()
     .on('error', function (err) {
       gutil.log(err.stack);
       this.emit('end');
     })
-    .on('error', (err) => browserSync.notify(err.message.toString(), 10000))
+    .on('error', err => browserSync.notify(err.message.toString(), 10000))
     .pipe(source('main.js'))
     .pipe(buffer())
     .pipe(gulp.dest('./dist/js'))
@@ -84,7 +101,7 @@ gulp.task('browser-sync', ['html', 'css', 'js'], () => {
   });
 });
 
-const tasks = ['html', 'css', 'js', 'images', 'fonts'];
+const tasks = ['html', 'css', 'js:vendor', 'js', 'images', 'fonts'];
 
 gulp.task('build', tasks);
 
