@@ -1,2 +1,2 @@
 # Gulp-html-boilerplate
-Gulp boilerplate for HTML development
+Gulp boilerplate for Front end development
