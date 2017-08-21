@@ -17,9 +17,9 @@ const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 
 gulp.task('css', () => {
-  return gulp.src('./src/scss/main.scss')
+  return gulp.src('./src/scss/*.scss')
     .pipe(sourcempas.init())
-    .pipe(sass({ outputStyle: 'expanded' }))
+    .pipe(sass({ outputStyle: 'expanded', includePaths: ['node_modules', 'bower_components', '.'] }))
     .on('error', sass.logError)
     .on('error', (err) => browserSync.notify(err.message.toString(), 10000))
     .pipe(autoprefixer('last 2 version'))
